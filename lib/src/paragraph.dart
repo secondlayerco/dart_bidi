@@ -297,12 +297,26 @@ class Normalization {
       }
     }
 
+    // Make sure text and lengths have the same length.
+    if (text.length < lengths.length) {
+      print('[bidi][Normalization.decompose] Error: text.length < lengths.length (text.length=${text.length} lengths.length=${lengths.length} text=$text): removing last elements from lengths');
+      lengths.removeRange(text.length, lengths.length);
+    } else if (text.length > lengths.length) {
+      print('[bidi][Normalization.decompose] Error: text.length > lengths.length (text.length=${text.length} lengths.length=${lengths.length} text=$text): adding 0s to lengths');
+      lengths.addAll(List<int>.filled(text.length - lengths.length, 0));
+    }
+
     return Normalization._(text, lengths, hasPersian, hasNSMs);
   }
 
   /// Compose.
   void _compose() {
     if (text.isEmpty) {
+      return;
+    }
+
+    if (text.length != lengths.length) {
+      print('[ERROR] _compose: text.length=${text.length} lengths.length=${lengths.length}');
       return;
     }
 
@@ -349,6 +363,7 @@ class Normalization {
         text[compPos] = ch;
         //char_lengths[compPos] = char_lengths[compPos] + 1;
         int chkPos = compPos;
+
         if (lengths[chkPos] < 0) {
           while (lengths[chkPos] < 0) {
             lengths[chkPos] = lengths[chkPos] + 1;
