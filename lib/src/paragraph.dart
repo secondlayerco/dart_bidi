@@ -299,8 +299,10 @@ class Normalization {
 
     // Make sure text and lengths have the same length.
     if (text.length < lengths.length) {
+      print('[bidi][Normalization.decompose] Error: text.length < lengths.length (text.length=${text.length} lengths.length=${lengths.length} text=$text): removing last elements from lengths');
       lengths.removeRange(text.length, lengths.length);
     } else if (text.length > lengths.length) {
+      print('[bidi][Normalization.decompose] Error: text.length > lengths.length (text.length=${text.length} lengths.length=${lengths.length} text=$text): adding 0s to lengths');
       lengths.addAll(List<int>.filled(text.length - lengths.length, 0));
     }
 
@@ -334,8 +336,6 @@ class Normalization {
 
     int oldLen = text.length;
 
-    print('[DEBUG] _compose: text=$text lengths=$lengths');
-
     // Loop on the decomposed characters, combining where possible
     int ch;
     for (int decompPos = compPos; decompPos < text.length; ++decompPos) {
@@ -349,14 +349,12 @@ class Normalization {
           composite != _BidiChars.notAChar &&
           (lastClass.value < chClass.value ||
               lastClass == _CanonicalClass.notReordered)) {
-        print('[DEBUG] _compose 1 - composite=$composite');
         text[starterPos] = composite;
         lengths[starterPos] = lengths[starterPos] + 1;
         // we know that we will only be replacing non-supplementaries by non-supplementaries
         // so we don't have to adjust the decompPos
         starterCh = composite;
       } else {
-        print('[DEBUG] _compose 2 - composite=$composite (${composite == _BidiChars.notAChar})');
         if (chClass == _CanonicalClass.notReordered || (isShaddaPair)) {
           starterPos = compPos;
           starterCh = ch;
@@ -365,19 +363,14 @@ class Normalization {
         text[compPos] = ch;
         //char_lengths[compPos] = char_lengths[compPos] + 1;
         int chkPos = compPos;
-        print('[DEBUG] _compose 2 - chkPos=$chkPos - lengths=$lengths lengths.length=${lengths.length}');
 
         if (lengths[chkPos] < 0) {
           while (lengths[chkPos] < 0) {
-            print('[DEBUG] _compose 3 - while 1');
             lengths[chkPos] = lengths[chkPos] + 1;
-            print('[DEBUG] _compose 3 - while 2');
             lengths.insert(compPos, 0);
             chkPos++;
-            print('[DEBUG] _compose 3 - while 3');
           }
         } else {
-          print('[DEBUG] _compose 3 - else');
           lengths[chkPos] = lengths[chkPos] + 1;
         }
 
@@ -392,8 +385,6 @@ class Normalization {
     text.length = compPos;
 
     final taken = lengths.take(compPos).toList();
-
-    print('[DEBUG] _compose done: lengths=$lengths');
 
     lengths.clear();
     lengths.addAll(taken);

@@ -10,17 +10,11 @@ class BidiString {
     final paragraphs = <Paragraph>[];
     final codeUnits = text.codeUnits;
 
-    print('[DEBUG] BidiString.fromLogical: text=$text');
-
     var next = <int>[];
     for (var i = 0; i < codeUnits.length; ++i) {
-      print('[DEBUG] BidiString.fromLogical: i=$i');
       final char = codeUnits[i];
-      print('[DEBUG] BidiString.fromLogical: char=$char');
       final type = getCharacterType(char);
-      print('[DEBUG] BidiString.fromLogical: type=$type');
       if (type == CharacterType.separator) {
-        print('[DEBUG] BidiString.fromLogical: separator');
         final paragraph = Paragraph._(next, char);
         paragraphs.add(paragraph);
         next = [];
