@@ -24,7 +24,7 @@ class BidiString {
         final paragraph = Paragraph._(next, char);
         paragraphs.add(paragraph);
         next = [];
-      } else {
+      } else if (type != CharacterType.ltr) {
         next.add(char);
       }
     }
