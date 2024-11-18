@@ -324,10 +324,6 @@ class Normalization {
 
     print('[DEBUG] _compose: text=$text lengths=$lengths');
 
-    if (lengths.isEmpty) {
-      return;
-    }
-
     // Loop on the decomposed characters, combining where possible
     int ch;
     for (int decompPos = compPos; decompPos < text.length; ++decompPos) {
@@ -358,26 +354,29 @@ class Normalization {
         //char_lengths[compPos] = char_lengths[compPos] + 1;
         int chkPos = compPos;
         print('[DEBUG] _compose 2 - chkPos=$chkPos - lengths=$lengths');
-        if (lengths[chkPos] < 0) {
-          while (lengths[chkPos] < 0) {
-            print('[DEBUG] _compose 3 - while 1');
-            lengths[chkPos] = lengths[chkPos] + 1;
-            print('[DEBUG] _compose 3 - while 2');
-            lengths.insert(compPos, 0);
-            chkPos++;
-            print('[DEBUG] _compose 3 - while 3');
-          }
-        } else {
-          print('[DEBUG] _compose 3 - else');
-          lengths[chkPos] = lengths[chkPos] + 1;
-        }
 
-        if (text.length != oldLen) // MAY HAVE TO ADJUST!
-        {
-          decompPos += text.length - oldLen;
-          oldLen = text.length;
+        if (lengths.length >= compPos) {
+          if (lengths[chkPos] < 0) {
+            while (lengths[chkPos] < 0) {
+              print('[DEBUG] _compose 3 - while 1');
+              lengths[chkPos] = lengths[chkPos] + 1;
+              print('[DEBUG] _compose 3 - while 2');
+              lengths.insert(compPos, 0);
+              chkPos++;
+              print('[DEBUG] _compose 3 - while 3');
+            }
+          } else {
+            print('[DEBUG] _compose 3 - else');
+            lengths[chkPos] = lengths[chkPos] + 1;
+          }
+
+          if (text.length != oldLen) // MAY HAVE TO ADJUST!
+          {
+            decompPos += text.length - oldLen;
+            oldLen = text.length;
+          }
+          ++compPos;
         }
-        ++compPos;
       }
     }
     text.length = compPos;
