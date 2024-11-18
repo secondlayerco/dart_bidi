@@ -322,7 +322,11 @@ class Normalization {
 
     int oldLen = text.length;
 
-    print('[DEBUG] _compose: text=$text');
+    print('[DEBUG] _compose: text=$text lengths=$lengths');
+
+    if (lengths.isEmpty) {
+      return;
+    }
 
     // Loop on the decomposed characters, combining where possible
     int ch;
