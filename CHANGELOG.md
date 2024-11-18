@@ -1,3 +1,7 @@
+## 2.0.13-napkin
+
+* Fix crash coming from Normalization.decompose if text.length != lengths.length.
+
 ## 2.0.13
 
 * Improve package score.
