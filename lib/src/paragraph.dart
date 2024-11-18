@@ -297,6 +297,13 @@ class Normalization {
       }
     }
 
+    // Make sure text and lengths have the same length.
+    if (text.length < lengths.length) {
+      lengths.removeRange(text.length, lengths.length);
+    } else {
+      print('[bidi][Normalization.decompose] Error - text.length=${text.length} lengths.length=${lengths.length}');
+    }
+
     return Normalization._(text, lengths, hasPersian, hasNSMs);
   }
 
