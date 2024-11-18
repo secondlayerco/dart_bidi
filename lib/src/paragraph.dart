@@ -353,6 +353,7 @@ class Normalization {
         text[compPos] = ch;
         //char_lengths[compPos] = char_lengths[compPos] + 1;
         int chkPos = compPos;
+        print('[DEBUG] _compose 2 - chkPos=$chkPos - lengths=$lengths');
         if (lengths[chkPos] < 0) {
           while (lengths[chkPos] < 0) {
             print('[DEBUG] _compose 3 - while 1');
