@@ -355,28 +355,34 @@ class Normalization {
         int chkPos = compPos;
         print('[DEBUG] _compose 2 - chkPos=$chkPos - lengths=$lengths lengths.length=${lengths.length} ${chkPos > lengths.length})');
 
-        if (chkPos > lengths.length) {
+        try {
           if (lengths[chkPos] < 0) {
             while (lengths[chkPos] < 0) {
-              print('[DEBUG] _compose 3 - while 1');
-              lengths[chkPos] = lengths[chkPos] + 1;
-              print('[DEBUG] _compose 3 - while 2');
-              lengths.insert(compPos, 0);
-              chkPos++;
-              print('[DEBUG] _compose 3 - while 3');
+              try {
+                print('[DEBUG] _compose 3 - while 1');
+                lengths[chkPos] = lengths[chkPos] + 1;
+                print('[DEBUG] _compose 3 - while 2');
+                lengths.insert(compPos, 0);
+                chkPos++;
+                print('[DEBUG] _compose 3 - while 3');
+              } catch (e) {
+                print('[bidi][Normalization._compose] Error ub while loop "lengths[chkPos] < 0": $e');
+              }
             }
           } else {
             print('[DEBUG] _compose 3 - else');
             lengths[chkPos] = lengths[chkPos] + 1;
           }
-
-          if (text.length != oldLen) // MAY HAVE TO ADJUST!
-          {
-            decompPos += text.length - oldLen;
-            oldLen = text.length;
-          }
-          ++compPos;
+        } catch (e) {
+          print('[bidi][Normalization._compose] Error: $e');
         }
+
+        if (text.length != oldLen) // MAY HAVE TO ADJUST!
+        {
+          decompPos += text.length - oldLen;
+          oldLen = text.length;
+        }
+        ++compPos;
       }
     }
     text.length = compPos;
