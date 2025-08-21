@@ -27,6 +27,7 @@ class Paragraph {
   final Normalization n;
 
   final List<int> _indices = [];
+  final List<int> _levels = [];
 
   /// Original text.
   List<int> get text {
@@ -42,6 +43,11 @@ class Paragraph {
     }
     return ret;
   }
+
+  /// Bidi embedding levels on original text
+  /// If a level is even, the corresponding character is left-to-right.
+  /// If a level is odd, the corresponding character is right-to-left.
+  List<int> get embeddingLevels => _levels;
 
   /// Bidi indexes.
   @Deprecated('Please use indices')
@@ -216,6 +222,15 @@ class Paragraph {
       start = limit;
     }
 
+    // Store embedding levels before reordering
+    final List<int> levels = [];
+    for (final cd in textData) {
+      levels.add(cd.embeddingLevel);
+    }
+
+    _levels.clear();
+    _levels.addAll(levels);
+
     _reorderString(textData, el);
     _fixMirroredCharacters(textData);
 
@@ -232,6 +247,7 @@ class Paragraph {
 
     _indices.clear();
     _indices.addAll(indexes);
+
   }
 }
 
