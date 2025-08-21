@@ -13,8 +13,8 @@ class Paragraph {
 
     n._compose();
 
-    final embeddingLevel = _calculateEmbeddingLevel(n);
-    _recalculateCharactersEmbeddingLevels(n, embeddingLevel);
+    _embeddingLevel = _calculateEmbeddingLevel(n);
+    _recalculateCharactersEmbeddingLevels(n, _embeddingLevel);
 
     _removeBidiMarkers();
   }
@@ -28,6 +28,7 @@ class Paragraph {
 
   final List<int> _indices = [];
   final List<int> _levels = [];
+  int _embeddingLevel = 0;
 
   /// Original text.
   List<int> get text {
@@ -48,6 +49,11 @@ class Paragraph {
   /// If a level is even, the corresponding character is left-to-right.
   /// If a level is odd, the corresponding character is right-to-left.
   List<int> get embeddingLevels => _levels;
+
+  /// Bidi embedding level of the paragraph
+  /// If a level is 0, the corresponding character is left-to-right.
+  /// If a level is 1, the corresponding character is right-to-left.
+  int get embeddingLevel => _embeddingLevel;
 
   /// Bidi indexes.
   @Deprecated('Please use indices')
