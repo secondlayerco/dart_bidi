@@ -229,13 +229,15 @@ class Paragraph {
     }
 
     // Store embedding levels before reordering
-    final List<int> levels = [];
+    final maxIndex = textData.fold<int>(0, (m, cd) => max(m, cd.index));
+    final levels = List<int>.filled(maxIndex + 1, 0);
     for (final cd in textData) {
-      levels.add(cd.embeddingLevel);
+      levels[cd.index] = cd.embeddingLevel;
     }
 
-    _levels.clear();
-    _levels.addAll(levels);
+    _levels
+      ..clear()
+      ..addAll(levels);
 
     _reorderString(textData, el);
     _fixMirroredCharacters(textData);
@@ -253,7 +255,6 @@ class Paragraph {
 
     _indices.clear();
     _indices.addAll(indexes);
-
   }
 }
 
