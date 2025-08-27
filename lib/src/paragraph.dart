@@ -298,7 +298,9 @@ class Normalization {
 
       final buffer = <int>[];
       _getRecursiveDecomposition(false, characters[i], buffer);
-      lengths.add(1 - buffer.length);
+      lengths.add(1);
+      lengths.addAll(List.filled(max(0, buffer.length - 1), 0));
+
       // add all of the characters in the decomposition.
       // (may be just the original character, if there was
       // no decomposition mapping)
@@ -320,15 +322,6 @@ class Normalization {
       }
     }
 
-    // Make sure text and lengths have the same length.
-    if (text.length < lengths.length) {
-      print('[bidi][Normalization.decompose] Error: text.length < lengths.length (text.length=${text.length} lengths.length=${lengths.length} text=$text): removing last elements from lengths');
-      lengths.removeRange(text.length, lengths.length);
-    } else if (text.length > lengths.length) {
-      print('[bidi][Normalization.decompose] Error: text.length > lengths.length (text.length=${text.length} lengths.length=${lengths.length} text=$text): adding 0s to lengths');
-      lengths.addAll(List<int>.filled(text.length - lengths.length, 0));
-    }
-
     return Normalization._(text, lengths, hasPersian, hasNSMs);
   }
 
@@ -347,8 +340,6 @@ class Normalization {
     int compPos = 1;
     var starterCh = text[0];
 
-    lengths[starterPos] = lengths[starterPos] + 1;
-
     var lastClass = _getCanonicalClass(starterCh);
 
     if (lastClass != _CanonicalClass.notReordered) {
@@ -361,8 +352,11 @@ class Normalization {
 
     // Loop on the decomposed characters, combining where possible
     int ch;
+    final newLengths = List.filled(text.length, 0, growable: true);
+    newLengths[0] = lengths[0];
     for (int decompPos = compPos; decompPos < text.length; ++decompPos) {
       ch = text[decompPos];
+      final lengthAtDecompPos = lengths[decompPos];
       final chClass = _getCanonicalClass(ch);
       final isShaddaPair = chClass.isShaddaPair;
       final composite = _getPairwiseComposition(starterCh, ch);
@@ -373,9 +367,7 @@ class Normalization {
           (lastClass.value < chClass.value ||
               lastClass == _CanonicalClass.notReordered)) {
         text[starterPos] = composite;
-        lengths[starterPos] = lengths[starterPos] + 1;
-        // we know that we will only be replacing non-supplementaries by non-supplementaries
-        // so we don't have to adjust the decompPos
+        newLengths[starterPos] = newLengths[starterPos] + lengthAtDecompPos;
         starterCh = composite;
       } else {
         if (chClass == _CanonicalClass.notReordered || (isShaddaPair)) {
@@ -384,18 +376,7 @@ class Normalization {
         }
         lastClass = chClass;
         text[compPos] = ch;
-        //char_lengths[compPos] = char_lengths[compPos] + 1;
-        int chkPos = compPos;
-
-        if (lengths[chkPos] < 0) {
-          while (lengths[chkPos] < 0) {
-            lengths[chkPos] = lengths[chkPos] + 1;
-            lengths.insert(compPos, 0);
-            chkPos++;
-          }
-        } else {
-          lengths[chkPos] = lengths[chkPos] + 1;
-        }
+        newLengths[compPos] = newLengths[compPos] + lengthAtDecompPos;
 
         if (text.length != oldLen) // MAY HAVE TO ADJUST!
         {
@@ -407,7 +388,7 @@ class Normalization {
     }
     text.length = compPos;
 
-    final taken = lengths.take(compPos).toList();
+    final taken = newLengths.take(compPos).toList();
 
     lengths.clear();
     lengths.addAll(taken);

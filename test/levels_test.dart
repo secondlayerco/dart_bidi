@@ -115,4 +115,12 @@ void main() {
       expect(levels, entry.value);
     }
   });
+
+  test('Embedding levels have same length as original text', () {
+    for (final text in ['你好，世界', 'Latin ABC-èéêëę', 'שלום 你好 مرحبا بالعالم']) {
+      final embeddingLevels =
+          bidi.BidiString.fromLogical(text).paragraphs.first.embeddingLevels;
+      expect(embeddingLevels.length, text.length);
+    }
+  });
 }
