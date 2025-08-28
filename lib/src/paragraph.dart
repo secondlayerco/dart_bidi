@@ -55,6 +55,9 @@ class Paragraph {
   /// If a level is 1, the corresponding character is right-to-left.
   int get embeddingLevel => _embeddingLevel;
 
+  /// Bidi embedding level of the paragraph
+  bool get isLeftToRight => _embeddingLevel % 2 == 0;
+
   /// Bidi indexes.
   @Deprecated('Please use indices')
   List<int> get bidiIndexes {
