@@ -3,7 +3,7 @@ part of '../bidi.dart';
 /// Represents a paragraph in text.
 class Paragraph {
   /// Constructor.
-  Paragraph._(List<int> text, this._separator)
+  Paragraph._(List<int> text, this._separator, {bool skipReshaping = false})
       : n = Normalization.decompose(text) {
     _originalText.clear();
 
@@ -14,7 +14,8 @@ class Paragraph {
     n._compose();
 
     _embeddingLevel = _calculateEmbeddingLevel(n);
-    _recalculateCharactersEmbeddingLevels(n, _embeddingLevel);
+    _recalculateCharactersEmbeddingLevels(n, _embeddingLevel,
+        skipReshaping: skipReshaping);
 
     _removeBidiMarkers();
   }
@@ -105,11 +106,12 @@ class Paragraph {
   }
 
   // 3.3.2 Explicit Levels and Directions
-  void _recalculateCharactersEmbeddingLevels(Normalization n, int el) {
+  void _recalculateCharactersEmbeddingLevels(Normalization n, int el,
+      {bool skipReshaping = false}) {
     // This method is implemented in such a way it handles the string in logical order,
     // rather than visual order, so it is easier to handle complex layouts. That is why
     // it is placed BEFORE ReorderString rather than AFTER it, as its number suggests.
-    if (n.hasPersian) {
+    if (!skipReshaping && n.hasPersian) {
       final shaped = n._performShaping();
       n.text.clear();
       n.text.addAll(shaped);
@@ -242,8 +244,10 @@ class Paragraph {
       ..clear()
       ..addAll(levels);
 
-    _reorderString(textData, el);
-    _fixMirroredCharacters(textData);
+    if (!skipReshaping) {
+      _reorderString(textData, el);
+      _fixMirroredCharacters(textData);
+    }
 
     List<int> indexes = [];
 
