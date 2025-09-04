@@ -3,7 +3,7 @@ part of '../bidi.dart';
 /// Represents a paragraph in text.
 class Paragraph {
   /// Constructor.
-  Paragraph._(List<int> text, this._separator, {bool skipReshaping = false})
+  Paragraph._(List<int> text, this._separator, {required bool skipReshaping})
       : n = Normalization.decompose(text) {
     _originalText.clear();
 
@@ -107,7 +107,7 @@ class Paragraph {
 
   // 3.3.2 Explicit Levels and Directions
   void _recalculateCharactersEmbeddingLevels(Normalization n, int el,
-      {bool skipReshaping = false}) {
+      {required bool skipReshaping}) {
     // This method is implemented in such a way it handles the string in logical order,
     // rather than visual order, so it is easier to handle complex layouts. That is why
     // it is placed BEFORE ReorderString rather than AFTER it, as its number suggests.
@@ -117,11 +117,12 @@ class Paragraph {
       n.text.addAll(shaped);
     }
     int embeddingLevel = el;
-    final text = n.text;
-    final lengths = n.lengths;
+    final text = !skipReshaping ? n.text : _originalText;
+    final lengths =
+        !skipReshaping ? n.lengths : List.generate(text.length, (index) => 1);
 
     final textData =
-        List<_CharData>.generate(n.text.length, (index) => _CharData());
+        List<_CharData>.generate(text.length, (index) => _CharData());
 
     // X1
     var dos = DirectionOverride.neutral;

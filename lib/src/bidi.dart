@@ -6,7 +6,7 @@ class BidiString {
 
   /// Implementation of the BIDI algorithm, as described in http://www.unicode.org/reports/tr9/tr9-17.html
   /// [text] is the original logical-ordered string. Returns the visual representation of the string.
-  factory BidiString.fromLogical(String text, {bool skipReshaping= false}) {
+  factory BidiString.fromLogical(String text, {bool skipReshaping = false}) {
     final paragraphs = <Paragraph>[];
     final codeUnits = text.codeUnits;
 
@@ -25,7 +25,8 @@ class BidiString {
 
     if (next.isNotEmpty) // string ended without a paragraph separator
     {
-      paragraphs.add(Paragraph._(next, _BidiChars.notAChar));
+      paragraphs.add(
+          Paragraph._(next, _BidiChars.notAChar, skipReshaping: skipReshaping));
     }
 
     return BidiString._(paragraphs);
@@ -97,7 +98,7 @@ List<Paragraph> splitStringToParagraphs(String logicalString) {
     final char = codeUnits[i];
     final type = getCharacterType(char);
     if (type == CharacterType.separator) {
-      final paragraph = Paragraph._(text, char);
+      final paragraph = Paragraph._(text, char, skipReshaping: false);
       paragraphs.add(paragraph);
       text = [];
     } else {
@@ -106,7 +107,7 @@ List<Paragraph> splitStringToParagraphs(String logicalString) {
   }
   if (text.isNotEmpty) // string ended without a paragraph separator
   {
-    paragraphs.add(Paragraph._(text, _BidiChars.notAChar));
+    paragraphs.add(Paragraph._(text, _BidiChars.notAChar, skipReshaping: false));
   }
   return paragraphs;
 }
